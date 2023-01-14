@@ -1,24 +1,30 @@
 "use strict";
 
-// ############
 // for collection of names, emails, avatar links from api
 const nameList = [];
 const emailList = [];
 const avatarList = [];
+
 const allProfiles = document.querySelector(".all-profiles");
-const errMsg = document.querySelector(".err-msg");
-function getResponse() {
-  const url = "https://reqres.in/api/users?per_page=12&" + Math.random(2);
+const statusMsg = document.querySelector(".status-msg");
+const page1_btn = document.getElementById("page-btn-1");
+const page2_btn = document.getElementById("page-btn-2");
+
+function getResponse(page = "per_page=6") {
+  // to empty all arrays
+  nameList.length = 0;
+  emailList.length = 0;
+  avatarList.length = 0;
+  allProfiles.innerHTML = "";
+  const url = `https://reqres.in/api/users?${page}&` + Math.random(2);
   const req = new XMLHttpRequest();
   req.open("GET", url);
   req.send();
   req.onload = function () {
     const responseData = req.responseText;
     const jsonResponse = JSON.parse(responseData);
-    // console.log(jsonResponse.data);
     const resultingData = jsonResponse.data;
     resultingData.forEach(function (element) {
-      //console.log(nameList);
       nameList.push(element.first_name);
       emailList.push(element.email);
       avatarList.push(element.avatar);
@@ -30,10 +36,10 @@ function getResponse() {
   req.onreadystatechange = function () {
     if (req.readyState === 4) {
       if (req.status === 200) {
-        errMsg.textContent = "Welcome";
+        statusMsg.textContent = "Welcome";
       } else {
-        errMsg.classList.add("red");
-        errMsg.textContent = `Something went wrong, Try again later:(`;
+        statusMsg.classList.add("red");
+        statusMsg.textContent = `Something went wrong, Try again later:(`;
       }
     }
   };
@@ -56,47 +62,9 @@ function displayProfile() {
 }
 getResponse();
 
-// IGNORE COMMENTS BELOW
-//displayProfile();
-// async function getResponseData() {
-//   const fetchData = await fetch(url);
-//   const jsonResponse = await fetchData.json().then((a) => {
-//     responseData.push(a.data[0].first_name);
-//   });
-//   return jsonResponse;
-// }
-
-// trial
-
-// console.log(responseData);s
-// function getValue(url) {
-//   const fetchData = fetch(url)
-//     .then((response) => {
-//       return response.json();
-//     })
-//     .then((response) => {
-//       return response;
-//     });
-//   console.log(fetchData);
-// }
-// getValue(url);
-
-//   .then((e) => {})
-//   .catch((err) => {
-//     console.log(err);
-//   });
-
-// displayProfile();
-//console.log(nameList);
-// console.log("ddasd");
-// return { name: nameList, email: emailList, avatar: avatarList };
-
-// Used async await for Asynchronous functionality for fetching data
-// async function getResponseData() {
-//   const url = "https://reqres.in/api/users?per_page=12";
-//   const fetchData = await fetch(url);
-//   const jsonResponse = await fetchData.json();
-//   return jsonResponse;
-// }
-// console.log(getResponseData());
-// getResponseData();
+page1_btn.addEventListener("click", function () {
+  getResponse("page=1");
+});
+page2_btn.addEventListener("click", function () {
+  getResponse("page=2");
+});

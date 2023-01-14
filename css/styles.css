@@ -12,7 +12,7 @@ img {
 }
 
 /* classes  */
-.err-msg {
+.status-msg {
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
@@ -44,4 +44,29 @@ img {
 .email {
   padding-top: 10px;
   padding-bottom: 10px;
+}
+.page-switchers {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+.page-switch-btn {
+  margin-right: 50px;
+  background-color: black;
+  color: white;
+  width: 80px;
+  height: 30px;
+  border: none;
+  border-radius: 20px;
+  transition: all;
+  transition-delay: 0.1s;
+  transition-duration: 0.15s;
+}
+.page-switch-btn:hover {
+  background-color: rgb(78, 78, 78);
+  color: white;
+  width: 80px;
+  height: 30px;
+  border: none;
+  border-radius: 20px;
 }
