@@ -36,7 +36,7 @@ function getResponse(page = "per_page=6") {
   // func for handling if it was not able to connect to the network
   req.onreadystatechange = function () {
     if (req.readyState === 1 || req.readyState === 2 || req.readyState === 3) {
-      loadingTime();
+      showLoading();
     } else if (req.readyState === 4) {
       if (req.status === 200) {
         statusMsg.textContent = "Welcome";
@@ -70,15 +70,15 @@ function displayProfile() {
 getResponse();
 
 page1_btn.addEventListener("click", function () {
-  loadingTime();
+  showLoading();
   getResponse("page=1");
 });
 page2_btn.addEventListener("click", function () {
-  loadingTime();
+  showLoading();
   getResponse("page=2");
 });
 
-function loadingTime() {
+function showLoading() {
   page1_btn.classList.add("hidden");
   page2_btn.classList.add("hidden");
   loading.classList.remove("hidden");
