@@ -1,9 +1,6 @@
 "use strict";
 
 // for collection of names, emails, avatar links from api
-const nameList = [];
-const emailList = [];
-const avatarList = [];
 
 const allProfiles = document.querySelector(".all-profiles");
 const statusMsg = document.querySelector(".status-msg");
