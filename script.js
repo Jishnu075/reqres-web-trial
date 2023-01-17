@@ -1,36 +1,54 @@
 "use strict";
 
-// for collection of names, emails, avatar links from api
-
 const allProfiles = document.querySelector(".all-profiles");
 const statusMsg = document.querySelector(".status-msg");
 const page1_btn = document.getElementById("page-btn-1");
 const page2_btn = document.getElementById("page-btn-2");
 const loading = document.querySelector(".loading");
 
-function getResponse(page = "per_page=6") {
-  // to empty all arrays
-  nameList.length = 0;
-  emailList.length = 0;
-  avatarList.length = 0;
-  allProfiles.innerHTML = "";
-  const url = `https://reqres.in/api/users?${page}&` + Math.random(2);
+// Template for User (profile data)
+class Users {
+  constructor(firstName, email, avatar) {
+    this.firstName = firstName;
+    this.email = email;
+    this.avatar = avatar;
+  }
+}
+
+// func for extracting the data from response as an object
+function userData(request) {
+  const responseData = request.responseText;
+  const jsonResponse = JSON.parse(responseData);
+  return jsonResponse.data;
+}
+
+function createUserProfle(responseData) {
+  responseData.forEach((data) => {
+    const user = new Users(data.first_name, data.email, data.avatar);
+    addHtmlContent(user.firstName, user.email, user.avatar);
+  });
+}
+function addHtmlContent(firstName, email, avatar) {
+  const html = `
+     <div class="profile">
+       <p class="first-name">${firstName}</p>
+       <p class="email">${email}</p>
+       <img
+         class="profile-img"
+         src="${avatar}"
+         alt=""/>
+     </div>`;
+  allProfiles.insertAdjacentHTML("beforeend", html);
+}
+
+function getResponse() {
+  const url = `https://reqres.in/api/users?per_page=12&` + Math.random(2);
   const req = new XMLHttpRequest();
   req.open("GET", url);
   req.onload = function () {
-    const responseData = req.responseText;
-    const jsonResponse = JSON.parse(responseData);
-    const resultingData = jsonResponse.data;
-    resultingData.forEach(function (element) {
-      nameList.push(element.first_name);
-      emailList.push(element.email);
-      avatarList.push(element.avatar);
-    });
-    displayProfile();
+    const resultingData = userData(req);
+    createUserProfle(resultingData);
   };
-  req.send();
-
-  // func for handling if it was not able to connect to the network
   req.onreadystatechange = function () {
     if (req.readyState === 1 || req.readyState === 2 || req.readyState === 3) {
       showLoading();
@@ -47,34 +65,19 @@ function getResponse(page = "per_page=6") {
       }
     }
   };
+  req.send();
 }
 
-function displayProfile() {
-  // loops over the nameList array and uses its index to access other list's elements
-  nameList.forEach((firstName, i) => {
-    const html = `
-    <div class="profile">
-      <p class="first-name">${firstName}</p>
-      <p class="email">${emailList[i]}</p>
-      <img
-        class="profile-img"
-        src="${avatarList[i]}"
-        alt=""/>
-    </div>`;
-    allProfiles.insertAdjacentHTML("beforeend", html);
-  });
-}
+// function displayProfile() {
+//   // loops over the nameList array and uses its index to access other list's elements
+//   // nameList.forEach((firstName, i) => {
+//   //   const html =
+//   //   allProfiles.insertAdjacentHTML("beforeend", html);
+//   // });
+// }
 getResponse();
 
-page1_btn.addEventListener("click", function () {
-  showLoading();
-  getResponse("page=1");
-});
-page2_btn.addEventListener("click", function () {
-  showLoading();
-  getResponse("page=2");
-});
-
+//TODO: btn functionality
 function showLoading() {
   page1_btn.classList.add("hidden");
   page2_btn.classList.add("hidden");
