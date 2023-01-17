@@ -46,7 +46,7 @@ function getResponse(page = "per_page=6") {
       } else {
         statusMsg.classList.add("red");
         loading.classList.add("hidden");
-        statusMsg.textContent = `Something went wrong, Try again later:(`;
+        statusMsg.textContent = `Something went wrong, Check your internet or try again later :(`;
       }
     }
   };
