@@ -22,6 +22,11 @@ function userData(request) {
   return jsonResponse.data;
 }
 
+function emptyPage() {
+  allProfiles.innerHTML = "";
+}
+
+// to check whether the data have recieved or not
 function createUserProfle(responseData) {
   responseData.forEach((data) => {
     const user = new Users(data.first_name, data.email, data.avatar);
@@ -41,43 +46,58 @@ function addHtmlContent(firstName, email, avatar) {
   allProfiles.insertAdjacentHTML("beforeend", html);
 }
 
-function getResponse() {
-  const url = `https://reqres.in/api/users?per_page=12&` + Math.random(2);
+// response handler
+function getResponse(page = 1) {
+  const url = `https://reqres.in/api/users?page=${page}&` + Math.random(2);
   const req = new XMLHttpRequest();
   req.open("GET", url);
   req.onload = function () {
     const resultingData = userData(req);
     createUserProfle(resultingData);
   };
-  req.onreadystatechange = function () {
-    if (req.readyState === 1 || req.readyState === 2 || req.readyState === 3) {
-      showLoading();
-    } else if (req.readyState === 4) {
-      if (req.status === 200) {
-        statusMsg.textContent = "Welcome";
-        loading.classList.add("hidden");
-        page1_btn.classList.remove("hidden");
-        page2_btn.classList.remove("hidden");
-      } else {
-        statusMsg.classList.add("red");
-        loading.classList.add("hidden");
-        statusMsg.textContent = `Something went wrong, Check your internet or try again later :(`;
-      }
-    }
+  req.onreadystatechange = () => {
+    statusHandler(req);
   };
   req.send();
 }
-
-// function displayProfile() {
-//   // loops over the nameList array and uses its index to access other list's elements
-//   // nameList.forEach((firstName, i) => {
-//   //   const html =
-//   //   allProfiles.insertAdjacentHTML("beforeend", html);
-//   // });
-// }
 getResponse();
 
-//TODO: btn functionality
+//error handler
+function statusHandler(request) {
+  if (
+    request.readyState === 1 ||
+    request.readyState === 2 ||
+    request.readyState === 3
+  ) {
+    showLoading();
+  } else if (request.readyState === 4) {
+    if (request.status === 200) {
+      statusMsg.textContent = "Welcome";
+      loading.classList.add("hidden");
+      page1_btn.classList.remove("hidden");
+      page2_btn.classList.remove("hidden");
+    } else {
+      statusMsg.classList.add("red");
+      loading.classList.add("hidden");
+      statusMsg.textContent = `Something went wrong, Check your internet or try again later :(`;
+    }
+  }
+}
+
+//btn functionality
+page1_btn.addEventListener("click", function () {
+  onClickPageBtn(1);
+});
+page2_btn.addEventListener("click", function () {
+  onClickPageBtn(2);
+});
+
+function onClickPageBtn(pageNum) {
+  emptyPage();
+  showLoading();
+  getResponse(pageNum);
+}
+
 function showLoading() {
   page1_btn.classList.add("hidden");
   page2_btn.classList.add("hidden");
