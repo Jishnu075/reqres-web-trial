@@ -103,26 +103,58 @@ class Users {
 //   page2_btn.classList.add("hidden");
 //   loading.classList.remove("hidden");
 // }
-$.ajax({
-  type: "GET",
-  dataType: "json",
-  url: `xhttps://reqres.in/api/users?page=2&` + Math.random(2),
-  success: function (jsonResponse) {
-    createUserProfle(jsonResponse);
-  },
-  error: (err) => {
-    console.log(err);
-  },
-});
+function getResponse() {
+  const url = `xhttps://reqres.in/api/users?page=2&`;
+  $.ajax({
+    type: "GET",
+    dataType: "json",
+    timeout: 5000,
+    url: url + Math.random(2),
+  })
+    .done(function (jsonResponse, textStatus, jqXHR) {
+      createUserProfle(jsonResponse);
+    })
+    .fail(function (jqXHR, textStatus, err) {
+      isContentError();
+    })
+    .always(function (jqXHR, textStatus, err) {
+      // callback => while the response is completed
+      isContentLoaded();
+    });
+  function isContentLoaded() {
+    $(".loading").hide();
+  }
 
-function createUserProfle(response) {
-  const responseArr = response.data;
-  responseArr.forEach((data) => {
-    const user = new Users(data.first_name, data.email, data.avatar);
-    addHtmlContent(user.firstName, user.email, user.avatar);
-    console.log(user.firstName);
-  });
+  function isContentError() {
+    $(".loading").hide();
+    if (navigator.onLine) {
+      $(".status-msg").html(`No Internet!<br>
+        Try: <br>
+        Checking the network cables, modem, and router,<br>
+      Reconnecting to Wi-Fi,<br>
+      Running Windows Network Diagnostics `);
+    } else {
+      $(".status-msg").html(`No Internet!<br>
+    Try: <br>
+    Checking the network cables, modem, and router,<br>
+  Reconnecting to Wi-Fi,<br>
+  Running Windows Network Diagnostics `);
+    }
+    $(".status-msg").animate({ fontSize: 20 });
+    $(".status-msg").css("color", "grey");
+    $("#page-btn-1").hide();
+    $("#page-btn-2").hide();
+  }
+  function createUserProfle(response) {
+    const responseArr = response.data;
+    responseArr.forEach((data) => {
+      const user = new Users(data.first_name, data.email, data.avatar);
+      addHtmlContent(user.firstName, user.email, user.avatar);
+      console.log(user.firstName);
+    });
+  }
 }
+getResponse();
 
 function addHtmlContent(firstName, email, avatar) {
   const html = `
