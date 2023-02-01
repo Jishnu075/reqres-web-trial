@@ -34,19 +34,20 @@ function getResponse(page = 1) {
     });
 }
 getResponse();
+
 // btn-functionalities
-$("#page-btn-1").click(() => {
-  $(".all-profiles").html("");
-  $("#page-btn-1, #page-btn-2").hide();
-  $(".loading").show();
-  getResponse(1);
-});
-$("#page-btn-2").click(() => {
-  $(".all-profiles").html("");
-  $("#page-btn-1, #page-btn-2").hide();
-  $(".loading").show();
-  getResponse(2);
-});
+// $("#page-btn-1").click(() => {
+//   $(".all-profiles").html("");
+//   $("#page-btn-1, #page-btn-2").hide();
+//   $(".loading").show();
+//   getResponse(1);
+// });
+// $("#page-btn-2").click(() => {
+//   $(".all-profiles").html("");
+//   $("#page-btn-1, #page-btn-2").hide();
+//   $(".loading").show();
+//   getResponse(2);
+// });
 
 function afterContentLoaded() {
   $("#page-btn-1, #page-btn-2").show();
@@ -92,3 +93,48 @@ function addHtmlContent(firstName, email, avatar) {
      </div>`;
   $(".all-profiles").append(html);
 }
+
+function createPageSwitchers(totalItemCount) {
+  // const pages =
+  //   totalItemCount % 6 !== 0 ? totalItemCount / 6 : totalItemCount / 6 + 1;
+  // console.log(pages);
+  let pages;
+  if (totalItemCount !== 6) {
+    pages = Math.ceil(totalItemCount / 6);
+  } else {
+    pages = 1;
+  }
+  // console.log(pages);
+
+  //TODO create pages according to the page no.
+  //1. if pages count is greater than 6, add first two buttons(1,2),
+  //  add ..., last no at the end
+  // 2. if pages are less than 4, add all 4 buttons
+
+  // case 1
+
+  // case 2
+  if (pages <= 4) {
+    for (i = 1; i <= pages; i++) {
+      // console.log(i);
+      $(".page-switchers").append(`
+        <input
+          class="page-switch-btn"
+          id="page-btn-${i}"
+          type="button"
+          value="${i}"
+          onclick="commonBtnOnClick(${i})"
+        />
+      `);
+    }
+  }
+}
+createPageSwitchers(24);
+
+// TODO a common functionality for all buttons
+function commonBtnOnClick(pageNum) {
+  $(".all-profiles").html("");
+  $(".loading").show();
+  getResponse(pageNum);
+}
+// totalItemCount % 6 === 0 ? totalItemCount / 6 : totalItemCount / 6 + 1;
