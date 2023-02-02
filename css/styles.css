@@ -74,11 +74,11 @@ img {
 .page-switch-btn:hover {
   transform: scale(1.1);
   background-color: rgb(46, 46, 46);
-  color: white;
-  width: 30px;
-  height: 30px;
-  border: none;
-  border-radius: 20px;
+}
+.page-switch-btn:focus {
+  background-color: white;
+  border: 1px solid grey;
+  color: black;
 }
 
 .ellipsis {
@@ -87,4 +87,22 @@ img {
   white-space: nowrap;
   font-size: 25px;
   margin-right: 15px;
+}
+.next-prev-btn {
+  font-size: 20px;
+  width: 50px;
+  height: 30px;
+  background-color: rgb(228, 228, 228);
+  color: black;
+  border-radius: 20px;
+  transition: all;
+  transition-delay: 0.1s;
+  transition-duration: 0.15s;
+  border: none;
+  margin-right: 15px;
+}
+.next-prev-btn:hover {
+  color: white;
+  background-color: rgb(198, 198, 198);
+  transform: scale(1.1);
 }
