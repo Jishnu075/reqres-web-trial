@@ -6,6 +6,15 @@ class Users {
     this.avatar = avatar;
   }
 }
+
+//to show error if internet is unavailable(without jquery)
+if (!navigator.onLine) {
+  document.querySelector(".status-msg").innerHTML = `No Internet!<br>
+  Try: <br>
+  Checking the network cables, modem, and router,<br>
+  Reconnecting to Wi-Fi,<br>
+  Running Windows Network Diagnostics `;
+}
 //api call to get json Response
 function getResponse(page = 1) {
   const url = `https://reqres.in/api/users?page=${page}&`;
@@ -28,9 +37,12 @@ function getResponse(page = 1) {
       console.log(err);
       showContentError();
     })
-    .always(function (jqXHR, textStatus, err) {
+    .always(function (resolved, textStatus, err) {
       // callback => while the response is resolved or rejected
       $(".loading").hide();
+      // to check if data is available
+      // FIXME;
+      // resolved.data.length === 0 ? showContentError() : null;
     });
 }
 getResponse();
@@ -50,7 +62,7 @@ getResponse();
 // });
 
 function afterContentLoaded() {
-  $("#page-btn-1, #page-btn-2").show();
+  $(".page-switchers").show();
   $(".status-msg").text("Welcome");
 }
 
@@ -59,8 +71,7 @@ function showContentError() {
   $(".loading").hide();
   $(".status-msg").animate({ fontSize: 24 });
   $(".status-msg").css("color", "grey");
-  $("#page-btn-1").hide();
-  $("#page-btn-2").hide();
+  $(".page-switchers").hide();
   // to check internet connectivity
   if (navigator.onLine) {
     $(".status-msg").html(`Something went wrong, try again later...`);
@@ -95,9 +106,6 @@ function addHtmlContent(firstName, email, avatar) {
 }
 
 function createPageSwitchers(totalItemCount) {
-  // const pages =
-  //   totalItemCount % 6 !== 0 ? totalItemCount / 6 : totalItemCount / 6 + 1;
-  // console.log(pages);
   let pages;
   if (totalItemCount !== 6) {
     pages = Math.ceil(totalItemCount / 6);
@@ -106,15 +114,15 @@ function createPageSwitchers(totalItemCount) {
   }
   // console.log(pages);
 
-  //TODO create pages according to the page no.
-  //1. if pages count is greater than 6, add first two buttons(1,2),
-  //  add ..., last no at the end
-  // 2. if pages are less than 4, add all 4 buttons
+  // TODO  pagination logic,
+
+  // 1.if theres 10 pages, show all the buttons until 10
+  // 2.show next and previous buttons
+  // 3.if theres more than 10 pages, then :
+  // pageno starts with 1 ,then ellipsis, then last 9 buttons
 
   // case 1
-
-  // case 2
-  if (pages <= 4) {
+  if (pages <= 10) {
     for (i = 1; i <= pages; i++) {
       // console.log(i);
       $(".page-switchers").append(`
@@ -129,12 +137,50 @@ function createPageSwitchers(totalItemCount) {
     }
   }
 }
-createPageSwitchers(24);
 
-// TODO a common functionality for all buttons
+// FIXME use this function when the api call is "done"
+createPageSwitchers(60);
+
+//  a common functionality for all buttons
 function commonBtnOnClick(pageNum) {
   $(".all-profiles").html("");
   $(".loading").show();
   getResponse(pageNum);
 }
 // totalItemCount % 6 === 0 ? totalItemCount / 6 : totalItemCount / 6 + 1;
+
+// logic that was applied before
+// create pages according to the page no.
+//1. if pages count is greater than 6, add first two buttons(1,2),
+//  add ..., last no at the end
+// 2. if pages are less than 4, add all 4 buttons
+
+// else {
+//   for (i = 1; i <= 2; i++) {
+//     $(".page-switchers").append(`
+//         <input
+//           class="page-switch-btn"
+//           id="page-btn-${i}"
+//           type="button"
+//           value="${i}"
+//           onclick="commonBtnOnClick(${i})"
+//         />
+//       `);
+//   }
+//   $(".page-switchers").append(`
+//     <div class="ellipsis">
+//       &hellip;
+//     </div>
+//       `);
+//   for (i = pages - 2; i <= pages; i++) {
+//     $(".page-switchers").append(`
+//         <input
+//           class="page-switch-btn"
+//           id="page-btn-${i}"
+//           type="button"
+//           value="${i}"
+//           onclick="commonBtnOnClick(${i})"
+//         />
+//       `);
+//   }
+// }
