@@ -57,7 +57,7 @@ getResponse();
 // $("#page-btn-2").click(() => {
 //   $(".all-profiles").html("");
 //   $("#page-btn-1, #page-btn-2").hide();
-//   $(".loading").show();
+$(".loading").show();
 //   getResponse(2);
 // });
 
@@ -105,9 +105,10 @@ function addHtmlContent(firstName, email, avatar) {
   $(".all-profiles").append(html);
 }
 
+let currentPage = 1;
 function createPageSwitchers(totalItemCount) {
   let pages;
-  if (totalItemCount !== 6) {
+  if (totalItemCount > 6) {
     pages = Math.ceil(totalItemCount / 6);
   } else {
     pages = 1;
@@ -121,33 +122,79 @@ function createPageSwitchers(totalItemCount) {
   // 3.if theres more than 10 pages, then :
   // pageno starts with 1 ,then ellipsis, then last 9 buttons
 
+  //func for repeated pagebtn html content
+  function returnPageBtnHtmlContent(pageNum) {
+    const html = `
+    <input
+      class="page-switch-btn"
+      id="page-btn-${pageNum}"
+      type="button"
+      value="${pageNum}"
+      onclick="commonBtnOnClick(${pageNum})"/>`;
+    return html;
+  }
   // case 1
   if (pages <= 10) {
     for (i = 1; i <= pages; i++) {
       // console.log(i);
-      $(".page-switchers").append(`
-        <input
-          class="page-switch-btn"
-          id="page-btn-${i}"
-          type="button"
-          value="${i}"
-          onclick="commonBtnOnClick(${i})"
-        />
-      `);
+      $(".page-switchers").append(returnPageBtnHtmlContent(i));
+    }
+  } else {
+    $(".page-switchers").append(returnPageBtnHtmlContent(1));
+    $(".page-switchers").append(returnPageBtnHtmlContent(2));
+
+    $(".page-switchers").append(`
+         <div class="ellipsis">
+           &hellip;
+         </div>
+           `);
+    for (i = pages - 3; i <= pages; i++) {
+      $(".page-switchers").append(returnPageBtnHtmlContent(i));
     }
   }
+
+  // previous and next btn
+
+  $(".page-switchers").prepend(`
+      <input
+        class="next-prev-btn"
+        id="page-btn-${i}"
+        type="button"
+        value="<"
+        onclick="commonBtnOnClick("previous")"
+
+      />
+   `);
+  $(".page-switchers").append(`
+      <input
+        class="next-prev-btn"
+        id="page-btn-${i}"
+        type="button"
+        value=">"
+        onclick="commonBtnOnClick("next")"
+
+      />
+    `);
 }
 
 // FIXME use this function when the api call is "done"
 createPageSwitchers(60);
 
 //  a common functionality for all buttons
-function commonBtnOnClick(pageNum) {
-  $(".all-profiles").html("");
-  $(".loading").show();
-  getResponse(pageNum);
+function commonBtnOnClick(value) {
+  if (value === "previous") {
+    // TODO prev btn functionality
+    // currentPage !== 1 ? getResponse(currentPage - 1) : getResponse(1);
+  } else if (value === "next") {
+    // TODO next btn functionality
+    // currentPage !== 1 ? getResponse(currentPage + 1) : getResponse(1);
+  } else if (Number.isInteger(value)) {
+    currentPage = value;
+    $(".all-profiles").html("");
+    $(".loading").show();
+    getResponse(value);
+  }
 }
-// totalItemCount % 6 === 0 ? totalItemCount / 6 : totalItemCount / 6 + 1;
 
 // logic that was applied before
 // create pages according to the page no.
