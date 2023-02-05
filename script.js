@@ -25,9 +25,10 @@ function getResponse(page = 1) {
     url: url + Math.random(2),
   })
     .done(function (jsonResponse, textStatus, jqXHR) {
-      console.log(jsonResponse);
       if (textStatus === "success") {
         createUserProfle(jsonResponse);
+        $(".page-switchers").empty();
+        createPageSwitchers(jsonResponse.total);
         afterContentLoaded();
       } else {
         showContentError();
@@ -40,6 +41,7 @@ function getResponse(page = 1) {
     .always(function (resolved, textStatus, err) {
       // callback => while the response is resolved or rejected
       $(".loading").hide();
+
       // to check if data is available
       // FIXME;
       // resolved.data.length === 0 ? showContentError() : null;
@@ -88,7 +90,6 @@ function createUserProfle(response) {
   responseArr.forEach((data) => {
     const user = new Users(data.first_name, data.email, data.avatar);
     addHtmlContent(user.firstName, user.email, user.avatar);
-    console.log(user.firstName);
   });
 }
 
@@ -161,7 +162,7 @@ function createPageSwitchers(totalItemCount) {
         id="page-btn-${i}"
         type="button"
         value="<"
-        onclick="commonBtnOnClick("previous")"
+        onclick="commonBtnOnClick(currentPage-1)"
 
       />
    `);
@@ -171,24 +172,16 @@ function createPageSwitchers(totalItemCount) {
         id="page-btn-${i}"
         type="button"
         value=">"
-        onclick="commonBtnOnClick("next")"
+        onclick="commonBtnOnClick(currentPage+1)"
 
-      />
-    `);
+      />`);
 }
 
 // FIXME use this function when the api call is "done"
-createPageSwitchers(60);
 
 //  a common functionality for all buttons
 function commonBtnOnClick(value) {
-  if (value === "previous") {
-    // TODO prev btn functionality
-    // currentPage !== 1 ? getResponse(currentPage - 1) : getResponse(1);
-  } else if (value === "next") {
-    // TODO next btn functionality
-    // currentPage !== 1 ? getResponse(currentPage + 1) : getResponse(1);
-  } else if (Number.isInteger(value)) {
+  if (Number.isInteger(value)) {
     currentPage = value;
     $(".all-profiles").html("");
     $(".loading").show();
