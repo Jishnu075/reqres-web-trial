@@ -64,7 +64,7 @@ function noContentErr() {
   $(".page-switchers").hide();
   $(".status-msg").html(`
       <div class="go-home">
-        <p>Content not available, Click to go back to homepage</p>
+        <p>Content not available, Click to go back to Home</p>
         <input
         class="next-prev-btn"
         id="go-home"
