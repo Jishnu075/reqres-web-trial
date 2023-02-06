@@ -25,11 +25,17 @@ function getResponse(page = 1) {
     url: url + Math.random(2),
   })
     .done(function (jsonResponse, textStatus, jqXHR) {
+      console.log(jsonResponse);
+
+      if (jsonResponse.data.length === 0) {
+        noContentErr();
+      } else {
+        afterContentLoaded();
+      }
       if (textStatus === "success") {
         createUserProfle(jsonResponse);
         $(".page-switchers").empty();
         createPageSwitchers(jsonResponse.total);
-        afterContentLoaded();
       } else {
         showContentError();
       }
@@ -41,31 +47,32 @@ function getResponse(page = 1) {
     .always(function (resolved, textStatus, err) {
       // callback => while the response is resolved or rejected
       $(".loading").hide();
-
-      // to check if data is available
-      // FIXME;
-      // resolved.data.length === 0 ? showContentError() : null;
     });
 }
 getResponse();
-
-// btn-functionalities
-// $("#page-btn-1").click(() => {
-//   $(".all-profiles").html("");
-//   $("#page-btn-1, #page-btn-2").hide();
-//   $(".loading").show();
-//   getResponse(1);
-// });
-// $("#page-btn-2").click(() => {
-//   $(".all-profiles").html("");
-//   $("#page-btn-1, #page-btn-2").hide();
 $(".loading").show();
-//   getResponse(2);
-// });
 
 function afterContentLoaded() {
   $(".page-switchers").show();
   $(".status-msg").text("Welcome");
+}
+
+function noContentErr() {
+  $(".loading").hide();
+  $(".status-msg").animate({ fontSize: 24 });
+  $(".status-msg").css("color", "grey");
+  $(".page-switchers").hide();
+  $(".status-msg").html(`
+      <div class="go-home">
+        <p>Content not available, Click to go back to homepage</p>
+        <input
+        class="next-prev-btn"
+        id="go-home"
+        type="button"
+        value="/\"
+        onclick="refreshPage()"
+      />
+      </div>`);
 }
 
 // function to handle errors
@@ -114,14 +121,12 @@ function createPageSwitchers(totalItemCount) {
   } else {
     pages = 1;
   }
-  // console.log(pages);
 
-  // TODO  pagination logic,
-
+  //   pagination logic,
   // 1.if theres 10 pages, show all the buttons until 10
   // 2.show next and previous buttons
   // 3.if theres more than 10 pages, then :
-  // pageno starts with 1 ,then ellipsis, then last 9 buttons
+  // pageno starts with 1 ,then ellipsis, then last  buttons
 
   //func for repeated pagebtn html content
   function returnPageBtnHtmlContent(pageNum) {
@@ -137,7 +142,6 @@ function createPageSwitchers(totalItemCount) {
   // case 1
   if (pages <= 10) {
     for (i = 1; i <= pages; i++) {
-      // console.log(i);
       $(".page-switchers").append(returnPageBtnHtmlContent(i));
     }
   } else {
@@ -155,11 +159,10 @@ function createPageSwitchers(totalItemCount) {
   }
 
   // previous and next btn
-
   $(".page-switchers").prepend(`
       <input
         class="next-prev-btn"
-        id="page-btn-${i}"
+        id="page-btn-${i * 0}"
         type="button"
         value="<"
         onclick="commonBtnOnClick(currentPage-1)"
@@ -177,8 +180,6 @@ function createPageSwitchers(totalItemCount) {
       />`);
 }
 
-// FIXME use this function when the api call is "done"
-
 //  a common functionality for all buttons
 function commonBtnOnClick(value) {
   if (Number.isInteger(value)) {
@@ -189,38 +190,6 @@ function commonBtnOnClick(value) {
   }
 }
 
-// logic that was applied before
-// create pages according to the page no.
-//1. if pages count is greater than 6, add first two buttons(1,2),
-//  add ..., last no at the end
-// 2. if pages are less than 4, add all 4 buttons
-
-// else {
-//   for (i = 1; i <= 2; i++) {
-//     $(".page-switchers").append(`
-//         <input
-//           class="page-switch-btn"
-//           id="page-btn-${i}"
-//           type="button"
-//           value="${i}"
-//           onclick="commonBtnOnClick(${i})"
-//         />
-//       `);
-//   }
-//   $(".page-switchers").append(`
-//     <div class="ellipsis">
-//       &hellip;
-//     </div>
-//       `);
-//   for (i = pages - 2; i <= pages; i++) {
-//     $(".page-switchers").append(`
-//         <input
-//           class="page-switch-btn"
-//           id="page-btn-${i}"
-//           type="button"
-//           value="${i}"
-//           onclick="commonBtnOnClick(${i})"
-//         />
-//       `);
-//   }
-// }
+function refreshPage() {
+  location.reload();
+}
