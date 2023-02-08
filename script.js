@@ -15,8 +15,13 @@ if (!navigator.onLine) {
   Reconnecting to Wi-Fi,<br>
   Running Windows Network Diagnostics `;
 }
+
+let currentPage = 1;
+let pages;
+
 //api call to get json Response
 function getResponse(page = 1) {
+  $(".all-profiles").empty();
   const url = `https://reqres.in/api/users?page=${page}&`;
   $.ajax({
     type: "GET",
@@ -27,15 +32,22 @@ function getResponse(page = 1) {
     .done(function (jsonResponse, textStatus, jqXHR) {
       console.log(jsonResponse);
 
-      if (jsonResponse.data.length === 0) {
-        noContentErr();
-      } else {
-        afterContentLoaded();
-      }
+      // if (jsonResponse.data.length === 0) {
+      //   noContentErr();
+      // } else {
+      //   afterContentLoaded();
+      // }
+      //FIXME
+      afterContentLoaded();
+
       if (textStatus === "success") {
         createUserProfle(jsonResponse);
-        $(".page-switchers").empty();
-        createPageSwitchers(jsonResponse.total);
+        // $(".page-switchers").empty();
+        //FIXME change count later as jsonResponse.total
+        countPages(jsonResponse.total);
+        if (page === "start") {
+          paginate(pages, "start");
+        }
       } else {
         showContentError();
       }
@@ -49,8 +61,10 @@ function getResponse(page = 1) {
       $(".loading").hide();
     });
 }
-getResponse();
+getResponse("start");
 $(".loading").show();
+isFirstPage();
+isLastpage();
 
 function afterContentLoaded() {
   $(".page-switchers").show();
@@ -80,7 +94,7 @@ function showContentError() {
   $(".loading").hide();
   $(".status-msg").animate({ fontSize: 24 });
   $(".status-msg").css("color", "grey");
-  $(".page-switchers").hide();
+  // $(".page-switchers").hide();
   // to check internet connectivity
   if (navigator.onLine) {
     $(".status-msg").html(`Something went wrong, try again later...`);
@@ -113,83 +127,131 @@ function addHtmlContent(firstName, email, avatar) {
   $(".all-profiles").append(html);
 }
 
-let currentPage = 1;
-function createPageSwitchers(totalItemCount) {
-  let pages;
-  if (totalItemCount > 6) {
-    pages = Math.ceil(totalItemCount / 6);
-  } else {
-    pages = 1;
-  }
-
-  //   pagination logic,
-  // 1.if theres 10 pages, show all the buttons until 10
-  // 2.show next and previous buttons
-  // 3.if theres more than 10 pages, then :
-  // pageno starts with 1 ,then ellipsis, then last  buttons
-
-  //func for repeated pagebtn html content
-  function returnPageBtnHtmlContent(pageNum) {
-    const html = `
-    <input
-      class="page-switch-btn"
-      id="page-btn-${pageNum}"
-      type="button"
-      value="${pageNum}"
-      onclick="commonBtnOnClick(${pageNum})"/>`;
-    return html;
-  }
-  // case 1
-  if (pages <= 10) {
-    for (i = 1; i <= pages; i++) {
-      $(".page-switchers").append(returnPageBtnHtmlContent(i));
-    }
-  } else {
-    $(".page-switchers").append(returnPageBtnHtmlContent(1));
-    $(".page-switchers").append(returnPageBtnHtmlContent(2));
-
-    $(".page-switchers").append(`
-         <div class="ellipsis">
-           &hellip;
-         </div>
-           `);
-    for (i = pages - 3; i <= pages; i++) {
-      $(".page-switchers").append(returnPageBtnHtmlContent(i));
-    }
-  }
-
-  // previous and next btn
-  $(".page-switchers").prepend(`
-      <input
-        class="next-prev-btn"
-        id="page-btn-${i * 0}"
-        type="button"
-        value="<"
-        onclick="commonBtnOnClick(currentPage-1)"
-
-      />
-   `);
-  $(".page-switchers").append(`
-      <input
-        class="next-prev-btn"
-        id="page-btn-${i}"
-        type="button"
-        value=">"
-        onclick="commonBtnOnClick(currentPage+1)"
-
-      />`);
-}
-
 //  a common functionality for all buttons
 function commonBtnOnClick(value) {
+  $(".pagination").empty();
+  $(".all-profiles").empty();
+  $(".loading").show();
+  // console.log(currentPage);
   if (Number.isInteger(value)) {
     currentPage = value;
-    $(".all-profiles").html("");
-    $(".loading").show();
-    getResponse(value);
+    console.log(currentPage);
+  } else if (value === "previous") {
+    console.log("prev");
+    if (currentPage > 1) currentPage--;
+    console.log(currentPage);
+  } else if (value === "next") {
+    if (currentPage < pages) currentPage++;
+    console.log(currentPage);
+  }
+  getResponse(currentPage);
+  paginate(currentPage);
+  isLastpage();
+  isFirstPage();
+}
+
+function isFirstPage() {
+  if (currentPage === 1) {
+    $("#previous-page-btn").hide();
+  } else {
+    $("#previous-page-btn").show();
+  }
+}
+function isLastpage() {
+  if (currentPage === pages) {
+    $("#next-page-btn").hide();
+  } else {
+    $("#next-page-btn").show();
   }
 }
 
 function refreshPage() {
   location.reload();
+}
+
+function countPages(totalItemCount) {
+  if (totalItemCount > 6) {
+    pages = Math.ceil(totalItemCount / 6);
+  } else {
+    pages = 1;
+  }
+}
+
+function paginate(selectedValue, start) {
+  $(".pagination").empty();
+  // TODO check pageno not equal to zero
+  if (pages <= 5) {
+    for (i = 1; i < pages + 1; i++) {
+      // console.log(i, "one");
+      $(`.pagination`).append(returnPageBtnHtmlContent(i));
+    }
+  } else {
+    // console.log(1);
+    if (start === "start") {
+      if (selectedValue !== 1) {
+        $(`.pagination`).append(returnPageBtnHtmlContent(1));
+        if (selectedValue !== 2) {
+          $(`.pagination`).append(returnPageBtnHtmlContent(2));
+          $(`.pagination`).append(ellipsis());
+        }
+      }
+    } else {
+      if (selectedValue !== 1) {
+        $(`.pagination`).append(returnPageBtnHtmlContent(1));
+        if (selectedValue !== 2) {
+          $(`.pagination`).append(ellipsis());
+        }
+      }
+    }
+
+    if (selectedValue <= pages - 3) {
+      for (
+        i = selectedValue > 3 ? selectedValue - 1 : selectedValue;
+        i < selectedValue + 3;
+        i++
+      ) {
+        console.log(i, "k");
+        $(`.pagination`).append(returnPageBtnHtmlContent(i));
+      }
+
+      $(`.pagination`).append(ellipsis());
+
+      // console.log(pageNo);
+      $(`.pagination`).append(returnPageBtnHtmlContent(pages));
+    } else {
+      for (i = pages - 3; i < pages; i++) {
+        // console.log(i, "f");
+        $(`.pagination`).append(returnPageBtnHtmlContent(i));
+      }
+      // console.log(pageNo);
+      $(`.pagination`).append(returnPageBtnHtmlContent(pages));
+    }
+  }
+}
+
+// FIXME replace these later
+// countPages(14);
+// paginate(6);
+
+// 1,2,3,4,..6
+// 1,4,5,6,...8
+// 1,5,6,7,8
+
+function ellipsis() {
+  const ellipsisHtmlContent = `
+        <div class="ellipsis">
+        &hellip;
+        </div>`;
+  return ellipsisHtmlContent;
+}
+
+function returnPageBtnHtmlContent(pageNum) {
+  const html = `
+    <input
+    class="page-switch-btn"
+    id="page-btn-${pageNum}"
+    type="button"
+    value="${pageNum}"
+    onclick="commonBtnOnClick(${pageNum})"/>`;
+  return html;
 }

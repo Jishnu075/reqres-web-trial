@@ -54,15 +54,16 @@ img {
 .loading {
   text-align: center;
 }
-.page-switchers {
+.page-nav {
   display: flex;
   justify-content: center;
   padding: 20px;
 }
 .page-switch-btn {
+  box-shadow: 5px 5px rgb(210, 210, 210);
   margin-right: 15px;
-  background-color: black;
-  color: white;
+  background-color: white;
+  color: black;
   width: 30px;
   height: 30px;
   border: none;
@@ -72,16 +73,16 @@ img {
   transition-duration: 0.15s;
 }
 .page-switch-btn:hover {
-  transform: scale(1.1);
-  background-color: rgb(46, 46, 46);
+  cursor: pointer;
+  background-color: grey;
+  color: white;
 }
 .page-switch-btn:focus {
-  background-color: white;
   border: 1px solid grey;
-  color: black;
 }
 
 .ellipsis {
+  display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -116,4 +117,10 @@ img {
 }
 #go-home {
   margin: 20px;
+}
+.pagination {
+  display: inline-block;
+}
+.active-btn {
+  transform: scale(1.2);
 }
