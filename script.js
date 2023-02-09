@@ -32,17 +32,16 @@ function getResponse(page = 1) {
     .done(function (jsonResponse, textStatus, jqXHR) {
       console.log(jsonResponse);
 
-      // if (jsonResponse.data.length === 0) {
-      //   noContentErr();
-      // } else {
-      //   afterContentLoaded();
-      // }
-      //FIXME
-      afterContentLoaded();
+      if (jsonResponse.data.length === 0) {
+        noContentErr();
+      } else {
+        afterContentLoaded();
+      }
+      // FIXME;
+      // afterContentLoaded();
 
       if (textStatus === "success") {
         createUserProfle(jsonResponse);
-        // $(".page-switchers").empty();
         //FIXME change count later as jsonResponse.total
         countPages(jsonResponse.total);
         if (page === "start") {
@@ -61,16 +60,18 @@ function getResponse(page = 1) {
       $(".loading").hide();
     });
 }
+
+//program-api starts here
 getResponse("start");
 $(".loading").show();
 isFirstPage();
 isLastpage();
 
 function afterContentLoaded() {
-  $(".page-switchers").show();
   $(".status-msg").text("Welcome");
 }
 
+// if the response contain 0 data
 function noContentErr() {
   $(".loading").hide();
   $(".status-msg").animate({ fontSize: 24 });
@@ -106,6 +107,8 @@ function showContentError() {
     Running Windows Network Diagnostics `);
   }
 }
+
+// creation of the users from response data
 function createUserProfle(response) {
   const responseArr = response.data;
   responseArr.forEach((data) => {
@@ -132,7 +135,7 @@ function commonBtnOnClick(value) {
   $(".pagination").empty();
   $(".all-profiles").empty();
   $(".loading").show();
-  // console.log(currentPage);
+  // console.log(currentPage, 123);
   if (Number.isInteger(value)) {
     currentPage = value;
     console.log(currentPage);
@@ -144,10 +147,15 @@ function commonBtnOnClick(value) {
     if (currentPage < pages) currentPage++;
     console.log(currentPage);
   }
+
   getResponse(currentPage);
   paginate(currentPage);
   isLastpage();
   isFirstPage();
+
+  //page highlight
+  $(".page-switch-btn").removeClass("active-btn");
+  $(`#page-btn-${value}`).addClass("active-btn");
 }
 
 function isFirstPage() {
@@ -210,10 +218,9 @@ function paginate(selectedValue, start) {
         i < selectedValue + 3;
         i++
       ) {
-        console.log(i, "k");
+        // console.log(i, "k");
         $(`.pagination`).append(returnPageBtnHtmlContent(i));
       }
-
       $(`.pagination`).append(ellipsis());
 
       // console.log(pageNo);
@@ -227,11 +234,9 @@ function paginate(selectedValue, start) {
       $(`.pagination`).append(returnPageBtnHtmlContent(pages));
     }
   }
+  //to set highlight for first page after html doc loads
+  $("#page-btn-1").addClass("active-btn");
 }
-
-// FIXME replace these later
-// countPages(14);
-// paginate(6);
 
 // 1,2,3,4,..6
 // 1,4,5,6,...8
